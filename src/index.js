@@ -4,6 +4,56 @@ import { UnsplashAPI } from './UnsplashAPI';
 
 const unsplash = new UnsplashAPI();
 
+const options = {
+  root: null,
+  rootMargin: '100px',
+  threshold: 1.0,
+};
+const callback = async function (entries, observer) {
+  entries.forEach(async entry => {
+    if (entry.isIntersecting) {
+      unsplash.incrementPage();
+      observer.unobserve(entry.target);
+
+      try {
+        const { hits } = await unsplash.getPhotos();
+
+        const dataOfPhotos = hits
+          .map(photo => {
+            return `<div class="photo-card">
+  <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
+  <div class="info">
+    <p class="info-item">
+      <b class="b-item">Likes ${photo.likes}</b>
+    </p>
+    <p class="info-item">
+      <b class="b-item">Views ${photo.views}</b>
+    </p>
+    <p class="info-item">
+      <b class="b-item">Comments ${photo.comments}</b>
+    </p>
+    <p class="info-item">
+      <b class="b-item">Downloads ${photo.downloads}</b>
+    </p>
+  </div>
+</div>`;
+          })
+          .join('');
+        photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
+        if (unsplash.isShowLoadMore) {
+          const target = document.querySelector('.info:last-child');
+          io.observe(target);
+          io.unobserve(entry.target);
+        }
+      } catch (error) {
+        Notify.failure(error.message, 'ERROR');
+        clearPage();
+      }
+    }
+  });
+};
+const io = new IntersectionObserver(callback, options);
+
 const photoGallery = document.querySelector('.gallery');
 const searchForm = document.querySelector('#search-form');
 const loadmoreBtn = document.querySelector('.load-more');
@@ -17,9 +67,7 @@ const onSearchForm = async event => {
   //   console.log(searchQuery);
   const searchQueryData = searchQuery.value.trim().toLowerCase();
   if (!searchQueryData) {
-    return Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
+    return Notify.failure('Sorry, enter your data. Please try again.');
   }
   unsplash.searchQuery = searchQueryData;
   clearPage();
@@ -54,12 +102,18 @@ const onSearchForm = async event => {
       })
       .join('');
     photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
+
     unsplash.calculateTotalPages(total);
     Notify.success(`Hooray! We found ${total} images.`);
     console.log(unsplash);
     if (unsplash.isShowLoadMore) {
-      loadmoreBtn.classList.remove('is-hidden');
+      //   loadmoreBtn.classList.remove('is-hidden');
+      const target = document.querySelector('.info:last-child');
+      io.observe(target);
     }
+    // if (!unsplash.isShowLoadMore) {
+    //   Notify.failure(error.message, 'ERROR');
+    // }
   } catch (error) {
     Notify.failure(error.message, 'ERROR');
     clearPage();
@@ -69,10 +123,7 @@ const onLoadMore = async () => {
   unsplash.incrementPage();
   try {
     const { hits } = await unsplash.getPhotos();
-    if (!unsplash.isShowLoadMore) {
-      loadmoreBtn.classList.add('is-hidden');
-      Notify.info(`We're sorry, but you've reached the end of search results.`);
-    }
+
     const dataOfPhotos = hits
       .map(photo => {
         return `<div class="photo-card">
