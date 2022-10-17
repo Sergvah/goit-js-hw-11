@@ -2,7 +2,21 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { UnsplashAPI } from './UnsplashAPI';
 
+// Описан в документации
+import SimpleLightbox from 'simplelightbox';
+// Дополнительный импорт стилей
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
 const unsplash = new UnsplashAPI();
+
+const photoGallery = document.querySelector('.gallery');
+const searchForm = document.querySelector('#search-form');
+const loadmoreBtn = document.querySelector('.load-more');
+
+let lightbox = new SimpleLightbox('.gallery-ref', {
+  captionsData: 'alt',
+  captionDelay: '250ms',
+});
 
 const options = {
   root: null,
@@ -20,9 +34,9 @@ const callback = async function (entries, observer) {
 
         const dataOfPhotos = hits
           .map(photo => {
-            return `<div class="photo-card">
+            return `<div class="photo-card"><a class="gallery-ref" href="${photo.largeImageURL}">
   <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
-  <div class="info">
+  </a><div class="info">
     <p class="info-item">
       <b class="b-item">Likes ${photo.likes}</b>
     </p>
@@ -45,6 +59,7 @@ const callback = async function (entries, observer) {
           io.observe(target);
           io.unobserve(entry.target);
         }
+        lightbox.refresh();
       } catch (error) {
         Notify.failure(error.message, 'ERROR');
         clearPage();
@@ -53,10 +68,6 @@ const callback = async function (entries, observer) {
   });
 };
 const io = new IntersectionObserver(callback, options);
-
-const photoGallery = document.querySelector('.gallery');
-const searchForm = document.querySelector('#search-form');
-const loadmoreBtn = document.querySelector('.load-more');
 
 const onSearchForm = async event => {
   //Чтобы не перезагружалась страница
@@ -82,9 +93,9 @@ const onSearchForm = async event => {
     }
     const dataOfPhotos = hits
       .map(photo => {
-        return `<div class="photo-card">
+        return `<div class="photo-card"><a class="gallery-ref" href="${photo.largeImageURL}">
   <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
-  <div class="info">
+  </a><div class="info">
     <p class="info-item">
       <b class="b-item">Likes</b> ${photo.likes}
     </p>
@@ -111,6 +122,7 @@ const onSearchForm = async event => {
       const target = document.querySelector('.info:last-child');
       io.observe(target);
     }
+    // lightbox.refresh();
     // if (!unsplash.isShowLoadMore) {
     //   Notify.failure(error.message, 'ERROR');
     // }
@@ -127,8 +139,8 @@ const onLoadMore = async () => {
     const dataOfPhotos = hits
       .map(photo => {
         return `<div class="photo-card">
-  <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
-  <div class="info">
+  <a class="gallery-ref" href="${photo.largeImageURL}"><img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
+  </a><div class="info">
     <p class="info-item">
       <b class="b-item">Likes ${photo.likes}</b>
     </p>
@@ -146,6 +158,7 @@ const onLoadMore = async () => {
       })
       .join('');
     photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
+    // lightbox.refresh();
   } catch (error) {
     Notify.failure(error.message, 'ERROR');
     clearPage();
