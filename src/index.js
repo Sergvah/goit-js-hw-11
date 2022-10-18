@@ -20,7 +20,7 @@ let lightbox = new SimpleLightbox('.gallery-ref', {
 
 const options = {
   root: null,
-  rootMargin: '100px',
+  rootMargin: '300px',
   threshold: 1.0,
 };
 const callback = async function (entries, observer) {
@@ -55,16 +55,16 @@ const callback = async function (entries, observer) {
           .join('');
         photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
         if (unsplash.isShowLoadMore) {
-          const target = document.querySelector('.info:last-child');
+          const target = document.querySelector('.photo-card:last-child');
           io.observe(target);
           io.unobserve(entry.target);
         }
-        lightbox.refresh();
       } catch (error) {
         Notify.failure(error.message, 'ERROR');
         clearPage();
       }
     }
+    lightbox.refresh();
   });
 };
 const io = new IntersectionObserver(callback, options);
@@ -119,7 +119,7 @@ const onSearchForm = async event => {
     console.log(unsplash);
     if (unsplash.isShowLoadMore) {
       //   loadmoreBtn.classList.remove('is-hidden');
-      const target = document.querySelector('.info:last-child');
+      const target = document.querySelector('.photo-card:last-child');
       io.observe(target);
     }
     // lightbox.refresh();
@@ -158,7 +158,7 @@ const onLoadMore = async () => {
       })
       .join('');
     photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
-    // lightbox.refresh();
+    lightbox.refresh();
   } catch (error) {
     Notify.failure(error.message, 'ERROR');
     clearPage();
