@@ -20,7 +20,7 @@ let lightbox = new SimpleLightbox('.gallery-ref', {
 
 const options = {
   root: null,
-  rootMargin: '300px',
+  rootMargin: '50px',
   threshold: 1.0,
 };
 const callback = async function (entries, observer) {
@@ -35,29 +35,29 @@ const callback = async function (entries, observer) {
         const dataOfPhotos = hits
           .map(photo => {
             return `<div class="photo-card"><a class="gallery-ref" href="${photo.largeImageURL}">
-  <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
-  </a><div class="info">
-    <p class="info-item">
-      <b class="b-item">Likes ${photo.likes}</b>
-    </p>
-    <p class="info-item">
-      <b class="b-item">Views ${photo.views}</b>
-    </p>
-    <p class="info-item">
-      <b class="b-item">Comments ${photo.comments}</b>
-    </p>
-    <p class="info-item">
-      <b class="b-item">Downloads ${photo.downloads}</b>
-    </p>
-  </div>
-</div>`;
+          <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
+          </a><div class="info">
+            <p class="info-item">
+              <b class="b-item">Likes ${photo.likes}</b>
+            </p>
+            <p class="info-item">
+              <b class="b-item">Views ${photo.views}</b>
+            </p>
+            <p class="info-item">
+              <b class="b-item">Comments ${photo.comments}</b>
+            </p>
+            <p class="info-item">
+              <b class="b-item">Downloads ${photo.downloads}</b>
+            </p>
+          </div>
+        </div>`;
           })
           .join('');
         photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
         if (unsplash.isShowLoadMore) {
           const target = document.querySelector('.photo-card:last-child');
           io.observe(target);
-          io.unobserve(entry.target);
+          //   io.unobserve(entry.target);
         }
       } catch (error) {
         Notify.failure(error.message, 'ERROR');
@@ -94,22 +94,22 @@ const onSearchForm = async event => {
     const dataOfPhotos = hits
       .map(photo => {
         return `<div class="photo-card"><a class="gallery-ref" href="${photo.largeImageURL}">
-  <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
-  </a><div class="info">
-    <p class="info-item">
-      <b class="b-item">Likes</b> ${photo.likes}
-    </p>
-    <p class="info-item">
-      <b class="b-item">Views</b> ${photo.views}
-    </p>
-    <p class="info-item">
-      <b class="b-item">Comments</b> ${photo.comments}
-    </p>
-    <p class="info-item">
-      <b class="b-item">Downloads</b> ${photo.downloads}
-    </p>
-  </div>
-</div>`;
+      <img src="${photo.webformatURL}" alt="${photo.tags}" class="img-gallery" loading="lazy" />
+      </a><div class="info">
+        <p class="info-item">
+          <b class="b-item">Likes</b> ${photo.likes}
+        </p>
+        <p class="info-item">
+          <b class="b-item">Views</b> ${photo.views}
+        </p>
+        <p class="info-item">
+          <b class="b-item">Comments</b> ${photo.comments}
+        </p>
+        <p class="info-item">
+          <b class="b-item">Downloads</b> ${photo.downloads}
+        </p>
+      </div>
+    </div>`;
       })
       .join('');
     photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
@@ -134,6 +134,9 @@ const onSearchForm = async event => {
 const onLoadMore = async () => {
   unsplash.incrementPage();
   try {
+    if (!unsplash.isShowLoadMore) {
+      loadmoreBtn.classList.add('is-hidden');
+    }
     const { hits } = await unsplash.getPhotos();
 
     const dataOfPhotos = hits
