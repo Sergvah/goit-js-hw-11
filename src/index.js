@@ -20,7 +20,7 @@ let lightbox = new SimpleLightbox('.gallery-ref', {
 
 const options = {
   root: null,
-  rootMargin: '50px',
+  rootMargin: '30px',
   threshold: 1.0,
 };
 const callback = async function (entries, observer) {
