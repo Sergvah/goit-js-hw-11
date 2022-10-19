@@ -161,7 +161,7 @@ const onLoadMore = async () => {
       })
       .join('');
     photoGallery.insertAdjacentHTML('beforeend', dataOfPhotos);
-    lightbox.refresh();
+    // lightbox.refresh();
   } catch (error) {
     Notify.failure(error.message, 'ERROR');
     clearPage();

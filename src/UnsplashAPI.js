@@ -2,7 +2,8 @@ import axios from 'axios';
 axios.defaults.baseURL = 'https://pixabay.com/api/';
 // const BASE_URL = 'https://pixabay.com/api/';
 const KEY = '30566822-5dd8c7f8088312f63e039c329';
-const params = `?key=${KEY}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40`;
+const params = `?key=${KEY}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40
+`;
 
 export class UnsplashAPI {
   //   API_KEY = '30566822-5dd8c7f8088312f63e039c329';
@@ -33,6 +34,6 @@ export class UnsplashAPI {
     this.#totalPages = Math.ceil(total / this.#perPage);
   }
   get isShowLoadMore() {
-    return this.#page < this.#totalPages;
+    return this.#page <= this.#totalPages;
   }
 }
